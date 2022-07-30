@@ -5,6 +5,9 @@ import os
 import argparse
 from typing import Dict
 
+from data import data_loader
+from model import CTC_Model
+
 parse = argparse.ArgumentParser(description="BiLSTM+CTC")
 
 parse.add_argument('--cuda', type=int, default=0)
@@ -226,7 +229,7 @@ def dev(model, dev_loader, cuda_available, loss_fn, i2w):
         if cuda_available:
             inputs = inputs.to(device)
 
-        inputs = nn.utils.rnn.pack_padded_sequence(inputs, inputs_size_list, batch_first=True)
+        inputs = nn.utils.rnn.pack_padded_sequence(inputs, inputs_size, batch_first=True)
 
         prob, out = model(inputs)
 
@@ -261,7 +264,7 @@ def dev(model, dev_loader, cuda_available, loss_fn, i2w):
 
 
         if (i + 1) % 20 == 0:
-            print(f'epoch={epoch + 1}, batch={i + 1}, loss={loss}, wer={wer * 100}%')
+            print(f'batch={i + 1}, loss={loss}, wer={wer * 100}%')
             print(f'pre is {decoded_strings[0]}')
             print(f'tar is {target_s[0]}')
             print(f'pre is {decoded_strings[1]}')
